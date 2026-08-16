@@ -1,0 +1,11 @@
+LICENSE
+README.md
+setup.py
+wtfix/__init__.py
+wtfix/cli.py
+wtfix.egg-info/PKG-INFO
+wtfix.egg-info/SOURCES.txt
+wtfix.egg-info/dependency_links.txt
+wtfix.egg-info/entry_points.txt
+wtfix.egg-info/requires.txt
+wtfix.egg-info/top_level.txt

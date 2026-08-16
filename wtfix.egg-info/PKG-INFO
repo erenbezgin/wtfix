@@ -1,0 +1,272 @@
+Metadata-Version: 2.4
+Name: wtfix
+Version: 0.1.0
+Summary: AI-powered terminal error analyzer
+Home-page: https://github.com/erenbezgin/wtfix
+Author: wtfix contributors
+License: MIT
+Project-URL: Bug Reports, https://github.com/erenbezgin/wtfix/issues
+Project-URL: Source, https://github.com/erenbezgin/wtfix
+Keywords: cli ai gemini debug error fix terminal devtools
+Classifier: Development Status :: 4 - Beta
+Classifier: Environment :: Console
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Software Development :: Debuggers
+Classifier: Topic :: Utilities
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: typer[all]>=0.12.0
+Requires-Dist: rich>=13.7.0
+Requires-Dist: google-genai>=1.0.0
+Dynamic: author
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: home-page
+Dynamic: keywords
+Dynamic: license
+Dynamic: license-file
+Dynamic: project-url
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
+
+<div align="center">
+
+# 🔧 wtfix — *What The Fix?*
+
+**AI-powered terminal error analyzer. Wrap any failing command and get instant, actionable solutions — right in your terminal.**
+
+[![Python](https://img.shields.io/badge/Python-3.9%2B-blue?logo=python&logoColor=white)](https://www.python.org/)
+[![Gemini](https://img.shields.io/badge/Powered%20by-Gemini%202.5%20Flash-8A2BE2?logo=google&logoColor=white)](https://deepmind.google/technologies/gemini/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Rich](https://img.shields.io/badge/Terminal%20UI-Rich-ff69b4)](https://github.com/Textualize/rich)
+[![Typer](https://img.shields.io/badge/CLI-Typer-009688)](https://typer.tiangolo.com/)
+
+---
+
+</div>
+
+## ✨ What is wtfix?
+
+`wtfix` is a zero-friction CLI tool that sits between you and your errors. It captures `stderr`, sends it to **Google Gemini 2.5 Flash**, and prints a crisp, structured diagnosis — no copy-pasting into ChatGPT, no Googling stack traces.
+
+---
+
+## 🚀 Features
+
+| Feature | Details |
+|---|---|
+| 🎯 **Subprocess mode** | Wrap any command: `wtfix python app.py` |
+| 🪄 **Pipe/stdin mode** | `cat error.log \| wtfix` |
+| 🤖 **Gemini 2.5 Flash** | Fast, smart, cost-effective analysis |
+| 🎨 **Rich terminal UI** | Spinner, panels, syntax-highlighted output |
+| 📋 **3-point report** | Root cause → Why it happened → Copy-paste fix |
+| 🌐 **Language agnostic** | Python, Node.js, Go, Rust, Docker, Bash … |
+| ⚡ **Zero config** | One env var, one install — done |
+
+---
+
+## 📦 Installation
+
+### 1 — Clone the repository
+
+```bash
+git clone https://github.com/erenbezgin/wtfix.git
+cd wtfix
+```
+
+### 2 — Install in editable mode
+
+```bash
+pip install -e .
+```
+
+The `wtfix` command is now available system-wide.
+
+### 3 — Set your Gemini API key
+
+Get a **free** API key at [aistudio.google.com](https://aistudio.google.com/app/apikey).
+
+```bash
+# Linux / macOS
+export GEMINI_API_KEY="your-key-here"
+
+# Windows PowerShell
+$env:GEMINI_API_KEY = "your-key-here"
+
+# Windows CMD
+set GEMINI_API_KEY=your-key-here
+```
+
+> **Tip:** Add the export line to your `~/.bashrc` or `~/.zshrc` so it persists across sessions.
+
+---
+
+## 🎬 Usage
+
+### Mode 1 — Subprocess (wrap a command)
+
+```bash
+wtfix python tests/broken_app.py
+wtfix npm run build
+wtfix go build ./...
+wtfix cargo build
+wtfix docker compose up
+```
+
+```
+╭─ Running command ────────────────────────────────────────────────────────────╮
+│ $ python tests/broken_app.py                                                 │
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭─ stderr output ──────────────────────────────────────────────────────────────╮
+│ Traceback (most recent call last):                                           │
+│   File "tests/broken_app.py", line 4, in <module>                           │
+│     import nonexistent_module                                                │
+│ ModuleNotFoundError: No module named 'nonexistent_module'                   │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+⚡ Analysing stderr with Gemini gemini-2.5-flash…
+
+⠸ Thinking
+
+╭─ 🤖 wtfix — AI Analysis ────────────────────────────────────────────────────╮
+│                                                                              │
+│ ## 1. 🔍 Hatanın Özü (Ne patladı?)                                          │
+│ Python could not find the module `nonexistent_module` at import time.        │
+│                                                                              │
+│ ## 2. 💡 Neden Kaynaklandı? (Satır, dosya ve mantık hatası)                 │
+│ Line 4 of `tests/broken_app.py` tries to import `nonexistent_module`,       │
+│ which is not installed in the current Python environment.                    │
+│                                                                              │
+│ ## 3. 🛠️ Çözüm Adımı                                                       │
+│ ```bash                                                                      │
+│ pip install nonexistent_module                                               │
+│ ```                                                                          │
+│ If the module name is a typo, correct the import statement instead.          │
+│                                                                              │
+╰────────────────────────── Powered by Gemini 2.5 Flash ──────────────────────╯
+```
+
+### Mode 2 — Pipe (stdin)
+
+```bash
+# Pipe a saved log file
+cat error.log | wtfix
+
+# Pipe both stdout and stderr from a command
+python app.py 2>&1 | wtfix
+
+# Combine commands
+npm run build 2>&1 | wtfix
+```
+
+### Getting help
+
+```bash
+wtfix --help
+wtfix --version
+```
+
+---
+
+## 📁 Project Structure
+
+```
+wtfix/
+├── wtfix/
+│   ├── __init__.py        # Version & package metadata
+│   └── cli.py             # Core CLI logic (Typer + Rich + Gemini)
+├── tests/
+│   └── broken_app.py      # Intentionally broken script for testing
+├── setup.py               # Packaging & entry-point definition
+├── requirements.txt       # Runtime dependencies
+├── .gitignore
+└── README.md
+```
+
+---
+
+## 🛠️ How It Works
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                         wtfix flow                              │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  ┌──────────────┐    fails    ┌──────────────────────────────┐  │
+│  │ Your command │ ──────────► │ Capture stderr / pipe input  │  │
+│  └──────────────┘             └──────────────┬───────────────┘  │
+│                                              │                  │
+│                                              ▼                  │
+│                               ┌─────────────────────────────┐  │
+│                               │  Gemini 2.5 Flash API call  │  │
+│                               └──────────────┬──────────────┘  │
+│                                              │                  │
+│                                              ▼                  │
+│                               ┌─────────────────────────────┐  │
+│                               │   Rich terminal report      │  │
+│                               │   1. 🔍 Root cause          │  │
+│                               │   2. 💡 Why it happened     │  │
+│                               │   3. 🛠️ Copy-paste fix      │  │
+│                               └─────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## ⚙️ Configuration
+
+| Environment Variable | Required | Description |
+|---|---|---|
+| `GEMINI_API_KEY` | ✅ Yes | Your Google Gemini API key |
+
+---
+
+## 🧪 Running Tests
+
+```bash
+# Test subprocess mode (should trigger AI analysis)
+wtfix python tests/broken_app.py
+
+# Test pipe mode
+python tests/broken_app.py 2>&1 | wtfix
+
+# Test missing API key handling (temporarily unset key)
+unset GEMINI_API_KEY && wtfix python tests/broken_app.py
+```
+
+---
+
+## 🤝 Contributing
+
+Pull requests are welcome! Please open an issue first to discuss major changes.
+
+1. Fork the repo
+2. Create a feature branch (`git checkout -b feat/my-feature`)
+3. Commit your changes (`git commit -m 'feat: add my feature'`)
+4. Push and open a Pull Request
+
+---
+
+## 📄 License
+
+MIT — see [LICENSE](LICENSE) for details.
+
+---
+
+<div align="center">
+
+Made with ❤️ and too many `Traceback` messages.
+
+**[Report a Bug](https://github.com/erenbezgin/wtfix/issues) · [Request a Feature](https://github.com/erenbezgin/wtfix/issues)**
+
+</div>

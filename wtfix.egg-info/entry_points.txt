@@ -1,0 +1,2 @@
+[console_scripts]
+wtfix = wtfix.cli:run
